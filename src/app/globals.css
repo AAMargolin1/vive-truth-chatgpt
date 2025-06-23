@@ -2,4 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-body { @apply bg-brand-navy text-gray-200 antialiased; }
+/* The body is now transparent to allow the background from layout.tsx to show through */
+body {
+  @apply bg-transparent;
+}
+
+@layer components {
+  /* This is our new, improved card style using the "Luminous Revelation" palette */
+  .glass-card {
+    /* Uses the new background color with transparency for the glass effect */
+    @apply bg-cosmic-ink/70 backdrop-blur-lg border border-ui-slate/60 rounded-lg transition-all duration-300;
+  }
+  
+  /* This version adds the interactive glow effect for clickable cards */
+  .glass-card-interactive {
+    @apply glass-card hover:border-luminous-cyan/50 hover:-translate-y-1 hover:shadow-glow-cyan;
+  }
+
+  /* A component for full-width sections that have a colored background */
+  .section-container {
+    @apply w-full py-20 sm:py-24;
+  }
+  
+  /* A component to constrain prose/text for readability within a full-width section */
+  .content-wrapper {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+}
