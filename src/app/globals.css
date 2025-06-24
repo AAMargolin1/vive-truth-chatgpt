@@ -2,30 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The body is now transparent to allow the background from layout.tsx to show through */
 body {
   @apply bg-transparent;
 }
 
 @layer components {
-  /* This is our new, improved card style using the "Luminous Revelation" palette */
-  .glass-card {
-    /* Uses the new background color with transparency for the glass effect */
-    @apply bg-cosmic-ink/70 backdrop-blur-lg border border-ui-slate/60 rounded-lg transition-all duration-300;
+  /* ======================================================================== */
+  /* SYSTEM 1: "LIVING GLASS" (Our Current, More Subtle Version)            */
+  /* ======================================================================== */
+  .living-glass {
+    @apply relative rounded-2xl p-8 shadow-2xl shadow-black/40 overflow-hidden;
+    background-color: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
-  
-  /* This version adds the interactive glow effect for clickable cards */
-  .glass-card-interactive {
-    @apply glass-card hover:border-luminous-cyan/50 hover:-translate-y-1 hover:shadow-glow-cyan;
+  .living-glass::before {
+    @apply content-[''] absolute inset-0 z-10 rounded-2xl pointer-events-none;
+    border: 1px solid transparent;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.2), rgba(255,255,255,0.05)) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .living-glass::after {
+    @apply content-[''] absolute z-[-1] rounded-full;
+    background: theme('colors.luminous-cyan');
+    width: 300px;
+    height: 300px;
+    top: -150px;
+    left: -150px;
+    opacity: 0.15;
+    filter: blur(100px);
+    transition: all 500ms ease-out;
+  }
+  .living-glass-interactive {
+    @apply living-glass transition-transform duration-300 ease-out;
+  }
+  .living-glass-interactive:hover {
+    @apply -translate-y-2;
+  }
+  .living-glass-interactive:hover::after {
+    opacity: 0.3;
+    transform: scale(1.5);
   }
 
-  /* A component for full-width sections that have a colored background */
-  .section-container {
-    @apply w-full py-20 sm:py-24;
+  /* ======================================================================== */
+  /* NEW EXPERIMENT: "VIBRANT LIVING GLASS"                                 */
+  /* A brighter, more intense version for a more striking effect.           */
+  /* ======================================================================== */
+  .living-glass-vibrant {
+    /* Brighter base color and slightly more prominent border */
+    @apply relative rounded-2xl p-8 shadow-2xl shadow-black/40 overflow-hidden;
+    background-color: rgba(255, 255, 255, 0.1); /* Increased opacity */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
-  
-  /* A component to constrain prose/text for readability within a full-width section */
+  .living-glass-vibrant::before {
+    @apply content-[''] absolute inset-0 z-10 rounded-2xl pointer-events-none;
+    border: 1px solid transparent;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.3), rgba(255,255,255,0.1)) border-box; /* Brighter border */
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .living-glass-vibrant::after {
+    @apply content-[''] absolute z-[-1] rounded-full;
+    background: theme('colors.luminous-cyan');
+    width: 300px;
+    height: 300px;
+    top: -150px;
+    left: -150px;
+    opacity: 0.2; /* Brighter default aurora */
+    filter: blur(100px);
+    transition: all 500ms ease-out;
+  }
+  .living-glass-vibrant-interactive {
+    @apply living-glass-vibrant transition-transform duration-300 ease-out;
+  }
+  .living-glass-vibrant-interactive:hover {
+    @apply -translate-y-2;
+  }
+  .living-glass-vibrant-interactive:hover::after {
+    opacity: 0.4; /* More intense hover bloom */
+    transform: scale(2.0); /* Larger hover bloom */
+  }
+
+  /* Universal wrappers for layout */
   .content-wrapper {
     @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .section-container {
+    @apply w-full py-20 sm:py-24;
   }
 }

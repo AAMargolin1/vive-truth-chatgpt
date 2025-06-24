@@ -1,0 +1,1089 @@
+PROJECT CODEBASE SNAPSHOT
+=========================
+Timestamp: Mon Jun 23 22:55:17 UTC 2025
+Project Root: /workspaces/vive-truth-chatgpt
+
+
+--- File: .eslintrc.json ---
+--------------------------------------------------
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "react/no-unescaped-entities": "off"
+  }
+}
+
+--- End of File: .eslintrc.json ---
+--------------------------------------------------
+
+--- File: package.json ---
+--------------------------------------------------
+{
+  "name": "vive-truth-stable",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.3",
+    "next": "14.2.3",
+    "react": "18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.3",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "autoprefixer": "^10.4.21",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.17",
+    "typescript": "5.4.5"
+  }
+}
+
+--- End of File: package.json ---
+--------------------------------------------------
+
+--- File: src/components/GenesisTimelineChart.tsx ---
+--------------------------------------------------
+'use client';
+
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LogarithmicScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+
+ChartJS.register(CategoryScale, LogarithmicScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+const chartData = {
+    // These labels correspond to the major events in the Genesis timeline
+    labels: [
+        'Beginning of Universe', 
+        'Earth forms, water-covered, opaque atmosphere', 
+        'Atmosphere becomes translucent ("Light")', 
+        'Stable Water Cycle Forms', 
+        'Dry Land Appears', 
+        'First Land Plants', 
+        'Atmosphere becomes transparent', 
+        'Small Sea Creatures (Cambrian)', 
+        'Flying Insects & Reptiles', 
+        'Land Mammals', 
+        'Humans'
+    ],
+    datasets: [{
+        label: 'Scientific Record (Years Before Present)',
+        // Data points are in years, the scale will make them logarithmic
+        data: [13.8e9, 4.5e9, 4.0e9, 3.8e9, 3.0e9, 475e6, 400e6, 541e6, 320e6, 66e6, 300000],
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+        fill: true,
+        tension: 0.1,
+        pointBackgroundColor: '#f59e0b',
+        pointHoverRadius: 7,
+    }]
+};
+
+const chartOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: { display: false },
+        title: {
+            display: true,
+            text: 'Concordance: Genesis 1 Event Order vs. Scientific Record',
+            color: '#ffffff',
+            font: { size: 20, family: "'Playfair Display', serif" }
+        },
+        tooltip: {
+            backgroundColor: 'rgba(10, 15, 31, 0.8)',
+            borderColor: '#f59e0b',
+            borderWidth: 1,
+            titleFont: { family: "'Playfair Display', serif" },
+            bodyFont: { family: "'Inter', sans-serif" },
+            padding: 10,
+            callbacks: {
+                // Custom tooltip to show formatted years
+                label: function(context: any) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                        label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                        const value = context.parsed.y;
+                        if (value >= 1e9) {
+                            label += `${(value / 1e9).toFixed(2)} Billion Years Ago`;
+                        } else if (value >= 1e6) {
+                            label += `${(value / 1e6).toFixed(2)} Million Years Ago`;
+                        } else if (value >= 1e3) {
+                             label += `${(value / 1e3).toFixed(2)} Thousand Years Ago`;
+                        } else {
+                            label += `${value} Years Ago`;
+                        }
+                    }
+                    return label;
+                }
+            }
+        }
+    },
+    scales: {
+        x: {
+            ticks: { color: '#9ca3af', font: { family: "'Inter', sans-serif", size: 10 } },
+            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        },
+        y: {
+            type: 'logarithmic',
+            title: { display: true, text: 'Years Before Present (Log Scale)', color: '#d1d5db', font: { family: "'Inter', sans-serif" } },
+            ticks: {
+                color: '#9ca3af',
+                // Custom ticks to format logarithmic scale labels
+                callback: function(value: any) {
+                    const numValue = Number(value);
+                    if (numValue === 1e10 || numValue === 1e9 || numValue === 1e8 || numValue === 1e7 || numValue === 1e6 || numValue === 1e5 || numValue === 1e4 || numValue === 1e3) {
+                        if (numValue >= 1e9) return `${numValue / 1e9}B`;
+                        if (numValue >= 1e6) return `${numValue / 1e6}M`;
+                        if (numValue >= 1e3) return `${numValue / 1e3}k`;
+                    }
+                    return null;
+                }
+            },
+            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        }
+    }
+};
+
+export default function GenesisTimelineChart() {
+  return (
+    <div className="glass-card p-4 md:p-8 mt-12">
+      <div className="relative h-[300px] sm:h-[400px] md:h-[500px]">
+        <Line data={chartData} options={chartOptions} />
+      </div>
+       <p className="text-center mt-6 text-gray-400 text-sm font-inter">
+        Analysis: The sequence of major creation events described in Genesis 1 shows a one-to-one correspondence with the established scientific record when viewed from the correct frame of reference (Earth's surface).
+      </p>
+    </div>
+  );
+}
+--- End of File: src/components/GenesisTimelineChart.tsx ---
+--------------------------------------------------
+
+--- File: src/components/GospelsManuscriptChart.tsx ---
+--------------------------------------------------
+'use client';
+
+import { Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+const chartData = {
+  labels: ['New Testament', 'Homer (Iliad)', 'Plato', 'Caesar (Gallic Wars)'],
+  datasets: [
+    {
+      label: 'Manuscript Copies (Log Scale)',
+      data: [24000, 1900, 210, 251],
+      backgroundColor: 'rgba(245, 158, 11, 0.6)',
+      borderColor: 'rgba(245, 158, 11, 1)',
+      borderWidth: 1,
+      yAxisID: 'y',
+    },
+    {
+      label: 'Time Gap to Earliest Copy (Years)',
+      data: [50, 500, 1200, 950],
+      backgroundColor: 'rgba(59, 130, 246, 0.6)',
+      borderColor: 'rgba(59, 130, 246, 1)',
+      borderWidth: 1,
+      yAxisID: 'y1',
+    },
+  ],
+};
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: {
+    mode: 'index' as const,
+    intersect: false,
+  },
+  plugins: {
+    title: {
+      display: true,
+      text: 'Ancient Texts: Manuscript Comparison',
+      color: '#ffffff',
+      font: { size: 20, family: "'Playfair Display', serif" },
+    },
+    legend: {
+      labels: {
+        color: '#d1d5db',
+        font: { family: "'Inter', sans-serif" },
+      },
+    },
+  },
+  scales: {
+    x: {
+      ticks: { color: '#9ca3af', font: { family: "'Inter', sans-serif" } },
+      grid: { color: 'rgba(255, 255, 255, 0.1)' },
+    },
+    y: {
+      type: 'logarithmic' as const,
+      position: 'left' as const,
+      title: {
+        display: true,
+        text: 'Number of Manuscripts',
+        color: 'rgba(245, 158, 11, 1)',
+      },
+      ticks: { color: 'rgba(245, 158, 11, 1)' },
+      grid: { color: 'rgba(255, 255, 255, 0.1)' },
+    },
+    y1: {
+      type: 'linear' as const,
+      position: 'right' as const,
+      title: {
+        display: true,
+        text: 'Time Gap (Years)',
+        color: 'rgba(59, 130, 246, 1)',
+      },
+      ticks: { color: 'rgba(59, 130, 246, 1)' },
+      grid: {
+        drawOnChartArea: false, // only draw grid lines for the first Y-axis
+      },
+    },
+  },
+};
+
+export default function GospelsManuscriptChart() {
+  return (
+    <div className="mt-12 p-8 border border-gray-800 bg-gray-900/50 rounded-lg">
+      <div style={{ height: '400px' }}>
+        <Bar options={chartOptions} data={chartData} />
+      </div>
+      <p className="text-center mt-4 text-gray-400 text-sm">
+        Analysis: The New Testament is the best-attested work of ancient literature by an order of magnitude, in both quantity of manuscripts and proximity to the original events.
+      </p>
+    </div>
+  );
+}
+
+--- End of File: src/components/GospelsManuscriptChart.tsx ---
+--------------------------------------------------
+
+--- File: src/components/Hero.tsx ---
+--------------------------------------------------
+'use client';
+
+export default function Hero() {
+  return (
+    <div className="relative">
+      {/* Three.js canvas will be implemented in Stage 2. This placeholder mimics the structure. */}
+      <div className="absolute inset-0 bg-brand-navy z-0">
+          <div className="absolute inset-0 flex items-center justify-center text-gray-700 text-sm">
+           [Three.js Animated Background Placeholder]
+         </div>
+      </div>
+
+      <section className="relative h-[60vh] md:h-[80vh] flex items-center justify-center text-center overflow-hidden">
+        {/* Gradient overlay to ensure text readability over the background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a0f1f] z-10"></div>
+        <div className="relative z-20 px-4">
+          <h1 
+            className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-tight"
+            style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.5)' }}
+          >
+            The God Hypothesis: An Analytical Investigation
+          </h1>
+          <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-gray-300 font-inter">
+            An analytical, evidence-based investigation of the hypothesis that God created the Universe, precisely prophesied the Messiah, Jesus Christ, for over 1,000 years, and definitively demonstrated His divine authority through Christ's resurrection from the dead.
+          </p>
+          <div className="mt-10 flex flex-col items-center">
+            {/* The <a> tag with href pointing to an ID on the same page will trigger smooth scroll by default in modern browsers */}
+            <a href="#argument-flow" className="group text-lg font-semibold accent-gold hover:text-amber-300">
+                <svg className="w-10 h-10 text-amber-500 mx-auto mb-2 animate-bounce-y" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+                Explore the Evidence
+            </a>
+            {/* Define the animation directly here for simplicity */}
+            <style jsx global>{`
+                .animate-bounce-y { animation: bounceY 2s infinite; }
+                @keyframes bounceY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+            `}</style>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+--- End of File: src/components/Hero.tsx ---
+--------------------------------------------------
+
+--- File: src/components/CambrianChart.tsx ---
+--------------------------------------------------
+'use client';
+
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+
+const chartData = {
+    labels: ['3.5B years ago', '2.5B', '1.5B', '541M', '530M', 'Today'],
+    datasets: [{ label: 'Number of Animal Phyla', data: [1, 1, 3, 3, 30, 30], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.2)', fill: true, stepped: true }]
+};
+
+const chartOptions = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+        legend: { display: false },
+        title: { display: true, text: "The Cambrian Explosion vs. Darwinian Expectation", color: '#e5e7eb', font: { size: 16, family: "'Playfair Display', serif" } }
+    },
+    scales: {
+        y: { title: { display: true, text: 'Number of Phyla (Body Plans)', color: '#e5e7eb' }, ticks: { color: '#e5e7eb' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+        x: { ticks: { color: '#e5e7eb' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+    }
+};
+
+export default function CambrianChart() {
+    return (
+        <div className="mt-4 p-4 md:p-6 border border-gray-800 bg-gray-900/50 rounded-lg">
+            <h4 className="font-playfair font-bold text-center mb-4 text-amber-400">Darwin's Own Test</h4>
+            <div className="relative h-[300px] md:h-[400px]"><Line options={chartOptions} data={chartData} /></div>
+        </div>
+    );
+}
+--- End of File: src/components/CambrianChart.tsx ---
+--------------------------------------------------
+
+--- File: src/components/ExpandableCard.tsx ---
+--------------------------------------------------
+'use client';
+
+import { useState, useRef } from 'react';
+
+type ExpandableCardProps = {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode; // The expandable content
+};
+
+export default function ExpandableCard({ title, subtitle, children }: ExpandableCardProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div className="border border-gray-700/50 bg-gray-900/80 backdrop-blur-md rounded-lg overflow-hidden">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full text-left p-6 flex justify-between items-center cursor-pointer hover:bg-gray-800/50 transition-colors"
+      >
+        <div>
+          <h3 className="font-playfair font-bold text-xl text-accent-gold">{title}</h3>
+          {subtitle && <p className="font-inter text-sm text-gray-400 mt-1">{subtitle}</p>}
+        </div>
+        <svg
+          className={`w-6 h-6 text-gray-400 transform transition-transform duration-300 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      <div
+        ref={contentRef}
+        style={{ maxHeight: isOpen ? contentRef.current?.scrollHeight : 0 }}
+        className="overflow-hidden transition-all duration-700 ease-in-out"
+      >
+        {/* The content inside is only rendered when the section is open, for performance */}
+        {isOpen && (
+          <div className="border-t border-gray-700/50 p-6">
+            {children}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+--- End of File: src/components/ExpandableCard.tsx ---
+--------------------------------------------------
+
+--- File: src/components/Footer.tsx ---
+--------------------------------------------------
+export default function Footer() {
+  return (
+    <footer className="bg-gray-900 mt-16 md:mt-24">
+      <div className="mx-auto max-w-4xl py-12 px-4 sm:px-6 lg:px-8 text-center text-gray-400">
+        <h3 className="font-playfair text-2xl font-bold">
+          <span className="text-accent-gold">VIVE</span>
+          <span className="text-white"> Truth</span>
+        </h3>
+        <p className="mt-4 max-w-2xl mx-auto font-inter">
+          VIVE Truth is a project dedicated to the rigorous, analytical exploration of the evidence for Christianity. We believe that faith is not a blind leap, but a reasoned trust in a God
+          who has revealed Himself through creation, history, and the person of Jesus Christ. Our mission is to present this evidence clearly and compellingly for a skeptical world.
+        </p>
+        <p className="mt-8 text-sm font-inter text-gray-500">
+          © 2024 VIVE Truth. All Rights Reserved. Content is for informational and educational purposes.
+        </p>
+      </div>
+    </footer>
+  );
+}
+--- End of File: src/components/Footer.tsx ---
+--------------------------------------------------
+
+--- File: src/components/ArgumentFlow.tsx ---
+--------------------------------------------------
+import Link from 'next/link';
+
+// (The data arrays are the same, so they are omitted for brevity in this instruction block. The code below is complete.)
+
+const slugToHref: { [key: string]: string } = { 'materialists-paradox': '/materialism', 'scientific-audit-of-genesis': '/creation', 'divine-echo': '/foreshadowing', 'prophetic-fingerprint': '/prophecies', 'gospels-on-trial': '/gospels', 'autopsy-of-history': '/resurrection', 'beyond-the-brain': '/ndes' };
+const argumentCards = [ { slug: 'materialists-paradox', icon: <svg className="h-6 w-6 text-accent-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636a9 9 0 010 12.728m-12.728 0a9 9 0 010-12.728m12.728 0L5.636 18.364m12.728 0L5.636 5.636" /></svg>, title: "1. The Materialist's Paradox", description: "An analytical audit of the prevailing scientific worldview, arguing it is falsified by data and requires more blind faith than theism.", linkText: 'Explore the Evidence' }, { slug: 'scientific-audit-of-genesis', icon: <svg className="h-6 w-6 text-accent-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-12v4m-2-2h4m5 4a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>, title: '2. A Scientific Audit of Genesis', description: 'Testing Genesis 1 as a scientific model against cosmology, demonstrating its superior predictive power over competing ancient myths and even naturalism.', linkText: 'Analyze the Design' }, { slug: 'divine-echo', icon: <svg className="h-6 w-6 text-accent-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M4 17h2m2 0h2m-4 4h4m4-16h2m2 0h2m-4-4v4m4 0v4m-4-4h4m-2 12h2m2 0h2M7 7l10 10M7 17L17 7" /></svg>, title: '3. The Divine Echo', description: 'Applying a rigorous analytical framework to distinguish divinely authored foreshadowing (typology) from mere coincidence in the Old Testament.', linkText: 'Uncover the Patterns' }, { slug: 'prophetic-fingerprint', icon: <svg className="h-6 w-6 text-accent-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v11.494m-9-5.747h18" /><path d="M12 6.253a4.5 4.5 0 00-4.5 4.5v2.494a4.5 4.5 0 009 0v-2.494a4.5 4.5 0 00-4.5-4.5z" /></svg>, title: '4. The Prophetic Fingerprint', description: 'Evaluating Messianic prophecy as objective, falsifiable evidence using an analytical framework to score for specificity and historical confirmation.', linkText: 'Examine the Predictions' }, { slug: 'gospels-on-trial', icon: <svg className="h-6 w-6 text-accent-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v11.494m-9-5.747h18" /><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 15.75h16.5M3.75 8.25h16.5" /></svg>, title: '5. The Gospels on Trial', description: 'A forensic investigation into the historical reliability of the Gospels using the standard tests of historiography and evidence from undesigned coincidences.', linkText: 'Weigh the Testimony' }, { slug: 'autopsy-of-history', icon: <svg className="h-6 w-6 text-accent-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19V5m0 14l-4-4m4 4l4-4" /><path d="M3 10h18M3 5h18" /></svg>, title: '6. An Autopsy of History', description: 'A forensic investigation of the resurrection, using bedrock facts accepted by mainstream scholars to demonstrate it as the inference to the best explanation.', linkText: 'Investigate the Central Claim' }];
+const bonusCard = { slug: 'beyond-the-brain', title: 'Bonus: Beyond the Brain', description: 'An analytical investigation of Near-Death Experiences, presenting both the objective evidence that falsifies materialism and the subjective data that corroborates a biblical worldview.', linkText: 'Consider Modern Evidence' };
+
+
+export default function ArgumentFlow() {
+  return (
+    <section id="argument-flow" className="py-20 sm:py-24">
+      {/* Container is now wider for the "full real estate" feel */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold text-white">A Rational Path to Faith</h2>
+          {/* Constrain text paragraphs for readability */}
+          <p className="mt-4 max-w-3xl mx-auto text-lg text-gray-300 font-inter">
+            The case for Christianity is not a blind leap, but a logical progression built on cumulative evidence. Each step below builds upon the last, forming a coherent and powerful argument.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {argumentCards.map((card) => (
+            <Link key={card.title} href={slugToHref[card.slug] || '/'} className="group block">
+              {/* Using our new .glass-card-interactive class */}
+              <div className="glass-card-interactive flex flex-col p-8 h-full">
+                <div className="flex-shrink-0"><div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-800">{card.icon}</div></div>
+                <div className="mt-6 flex-grow"><h3 className="font-playfair text-xl font-bold text-white">{card.title}</h3><p className="mt-3 text-base text-gray-300 font-inter">{card.description}</p></div>
+                <div className="mt-6"><p className="font-semibold text-accent-gold transition group-hover:text-amber-300 font-inter">{card.linkText} →</p></div>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-10 flex justify-center">
+          {/* Bonus card width adjusted relative to the new wider container */}
+          <Link href={slugToHref[bonusCard.slug] || '/'} className="group block w-full lg:w-3/4">
+             <div className="glass-card-interactive flex w-full flex-col items-center p-8 md:flex-row">
+              <div className="mb-6 flex-shrink-0 md:mb-0 md:mr-8"><div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-800"><svg className="h-8 w-8 text-accent-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6c0-1.791-.76-3.414-2-4.625a6 6 0 00-4-1.625a6 6 0 00-4 1.625a6 6 0 00-2 4.625a6 6 0 006 6z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 15.75a3.75 3.75 0 003.75-3.75c0-1.12-.485-2.14-1.28-2.835a3.75 3.75 0 00-4.94 0c-.795.695-1.28 1.715-1.28 2.835A3.75 3.75 0 0012 15.75z" /></svg></div></div>
+              <div className="flex-grow text-center md:text-left"><h3 className="font-playfair text-xl font-bold text-white">{bonusCard.title}</h3><p className="mt-2 text-base text-gray-300 font-inter">{bonusCard.description}</p><div className="mt-4"><p className="font-semibold text-accent-gold transition group-hover:text-amber-300 font-inter">{bonusCard.linkText} →</p></div></div>
+            </div>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+--- End of File: src/components/ArgumentFlow.tsx ---
+--------------------------------------------------
+
+--- File: src/components/Header.tsx ---
+--------------------------------------------------
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
+const navLinks = [
+  { href: '/', text: 'Home' },
+  { href: '/materialism', text: 'Materialism' },
+  { href: '/creation', text: 'Creation' },
+  { href: '/foreshadowing', text: 'Foreshadowing' },
+  { href: '/prophecies', text: 'Prophecies' },
+  { href: '/gospels', text: 'Gospels' },
+  { href: '/resurrection', text: 'Resurrection' },
+  { href: '/ndes', text: 'NDEs' },
+];
+
+export default function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  return (
+    <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-brand-navy/80 border-b border-gray-800">
+      <div className="mx-auto flex max-w-6xl items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="text-2xl font-playfair font-bold">
+          <span className="text-accent-gold">VIVE</span><span className="text-white">Truth</span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-baseline space-x-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.text}
+              href={link.href}
+              className={`font-inter text-sm px-3 py-2 rounded-md transition-colors ${
+                pathname === link.href
+                  ? 'text-accent-gold bg-gray-700/50'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              {link.text}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden flex items-center">
+          <button
+            onClick={toggleMobileMenu}
+            className="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+            aria-expanded={isMobileMenuOpen}
+          >
+            <span className="sr-only">Open main menu</span>
+            {isMobileMenuOpen ? (
+              <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            ) : (
+              <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Panel */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {navLinks.map((link) => (
+              <Link
+                key={`mobile-${link.text}`}
+                href={link.href}
+                className={`block font-inter text-base px-3 py-2 rounded-md transition-colors ${
+                  pathname === link.href
+                    ? 'text-accent-gold bg-gray-700'
+                    : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+                }`}
+              >
+                {link.text}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}
+--- End of File: src/components/Header.tsx ---
+--------------------------------------------------
+
+--- File: src/app/layout.tsx ---
+--------------------------------------------------
+import './globals.css';
+import { Inter, Playfair_Display } from 'next/font/google';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
+
+export const metadata = {
+  title: 'VIVE Truth – The God Hypothesis',
+  description: 'An analytical investigation into the evidence for God.',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+      <body className="bg-brand-navy text-gray-200 font-inter antialiased">
+        {/* Subtle Cosmic Background */}
+        <div className="fixed inset-0 z-[-1] bg-brand-navy">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(52,64,112,0.3),transparent_40%)]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(100,50,90,0.25),transparent_40%)]"></div>
+        </div>
+
+        <Header />
+        <div className="relative z-10">{children}</div>
+        <Footer />
+      </body>
+    </html>
+  );
+}
+--- End of File: src/app/layout.tsx ---
+--------------------------------------------------
+
+--- File: src/app/globals.css ---
+--------------------------------------------------
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* The body is now transparent to allow the background from layout.tsx to show through */
+body {
+  @apply bg-transparent;
+}
+
+@layer components {
+  /* This is our new, improved card style using the "Luminous Revelation" palette */
+  .glass-card {
+    /* Uses the new background color with transparency for the glass effect */
+    @apply bg-cosmic-ink/70 backdrop-blur-lg border border-ui-slate/60 rounded-lg transition-all duration-300;
+  }
+  
+  /* This version adds the interactive glow effect for clickable cards */
+  .glass-card-interactive {
+    @apply glass-card hover:border-luminous-cyan/50 hover:-translate-y-1 hover:shadow-glow-cyan;
+  }
+
+  /* A component for full-width sections that have a colored background */
+  .section-container {
+    @apply w-full py-20 sm:py-24;
+  }
+  
+  /* A component to constrain prose/text for readability within a full-width section */
+  .content-wrapper {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+}
+--- End of File: src/app/globals.css ---
+--------------------------------------------------
+
+--- File: src/app/creation/page.tsx ---
+--------------------------------------------------
+import Link from 'next/link';
+import GenesisTimelineChart from '@/components/GenesisTimelineChart';
+
+const SectionDivider = () => <hr className="my-12 border-t border-gray-700 md:my-16" />;
+
+const creationEventsData = [
+  { day: 1, title: 'A Beginning & First Light', claims: [ {c: 'The Universe had a beginning.', s: 'Science confirms a finite beginning—The Big Bang.'}, {c: 'Earth was "formless and empty," dark, and covered in water.', s:'Scientific models show exactly this: a dark, water-enveloped protoplanet.'}, {c: '"Let there be light."', s:'This corresponds to the atmosphere thinning to become translucent, allowing diffuse light to reach the surface.'} ]},
+  { day: 2, title: 'Atmosphere Forms', claims: [ {c: 'Separation of "waters above" from "waters below."', s:'This poetically describes the formation of a stable atmosphere and water cycle, with oceans below and vapor/clouds above.'} ]},
+  { day: 3, title: 'Dry Land & Plants', claims: [ {c:'Dry land appears.', s:'Tectonic activity pushed continents above the early global ocean.'}, {c:'Land produces vegetation.', s:'Plant life was the first to colonize the new continents, a necessary precursor for animal life.'} ]},
+  { day: 4, title: 'Sun, Moon, Stars Appear', claims: [ {c:'Celestial bodies appear "for signs and for seasons".', s:"From Earth's surface, this is when the atmosphere cleared from translucent to transparent, making the sun, moon, and stars visible as distinct objects for the first time."} ]},
+  { day: 5, title: 'Small Sea & Flying Creatures', claims: [ {c:'Waters teem with swarms of living creatures, and birds fly.', s:'This matches the fossil record: the Cambrian Explosion of small sea animals, followed by flying insects and later, birds.'} ]},
+  { day: 6, title: 'Land Animals & Humans', claims: [ {c:'Land animals are created.', s:'Fossil record confirms land animals became abundant after sea and air life.'}, {c:'Humankind is created last.', s:'Science is unequivocal that anatomically modern humans appear very late in the geological record, the final major addition.'} ]}
+];
+
+const comparisonTableData = [
+    { feature: 'Nature of God(s)', genesis: 'One, transcendent, pre-existent God', enuma: 'Many gods, born of chaos, who fight and kill each other', egyptian: 'Many gods, often zoomorphic, emerging from a primordial ocean' },
+    { feature: 'Creation Process', genesis: 'Orderly, by divine command ("Let there be...")', enuma: 'Violent combat; world made from the corpse of a slain goddess', egyptian: 'Often through magical utterance or bodily fluids of a god' },
+    { feature: 'Origin of Humanity', genesis: "Pinnacle of creation, made in God's image", enuma: 'An afterthought, made from demon blood to be slaves for the gods', egyptian: 'Typically formed from clay or the tears of a god' },
+    { feature: 'Scientific Correlation', genesis: 'High degree of correspondence with cosmology', enuma: 'No correspondence', egyptian: 'No correspondence' },
+];
+
+export default function CreationPage() {
+  return (
+    <main className="py-16 sm:py-20">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="mb-8 inline-flex items-center text-sm font-semibold text-accent-gold hover:text-amber-300 transition-colors">← Back to Main Argument</Link>
+        <h1 className="font-playfair text-4xl md:text-5xl font-bold text-center text-accent-gold">A Scientific Audit of Genesis</h1>
+        <p className="mt-4 font-inter text-xl text-gray-300 max-w-3xl mx-auto text-center">An investigation into whether the Bible’s most ancient account of creation stands up to the scrutiny of 21st-century science.</p>
+        <SectionDivider />
+        <section>
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold text-center text-gray-100">Genesis 1 as a Testable Scientific Model</h2>
+          <p className="mt-6 font-inter text-lg text-gray-300 max-w-4xl mx-auto text-center">We approach Genesis 1 as a list of initial conditions and creation events from the frame of reference of Earth's surface. Let's audit its claims against the scientific record.</p>
+          <div className="mt-6"><GenesisTimelineChart /></div>
+        </section>
+        <SectionDivider />
+        <section>
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold text-center text-gray-100">Creation Event Analysis</h2>
+          <div className="mt-12 space-y-12">{creationEventsData.map((event) => (<div key={event.day} className="border border-gray-700/50 bg-gray-900/80 backdrop-blur-md rounded-lg p-6 md:p-8 grid md:grid-cols-3 gap-8 items-center"><div className="md:col-span-1 text-center"><h3 className="font-playfair text-5xl font-bold text-accent-gold">Day {event.day}</h3><p className="font-playfair text-xl font-semibold text-gray-100 mt-2">{event.title}</p></div><div className="md:col-span-2">{event.claims.map((claim, index) => (<div key={index} className={index > 0 ? 'mt-4' : ''}><h4 className="font-playfair text-xl font-bold text-amber-400">{claim.c}</h4><p className="mt-2 font-inter text-gray-300">{claim.s}</p></div>))}</div></div>))}</div>
+        </section>
+        <SectionDivider />
+        <section>
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold text-center text-gray-100">How Does Genesis Compare to Other Ancient Myths?</h2>
+          <div className="mt-12 border border-gray-700/50 bg-gray-900/80 backdrop-blur-md rounded-lg p-2 md:p-4 overflow-x-auto"><table className="w-full min-w-[700px] text-left"><thead><tr className="border-b border-gray-700"><th className="p-3 md:p-4 font-playfair font-bold text-lg text-gray-100">Feature</th><th className="p-3 md:p-4 font-playfair font-bold text-lg text-accent-gold">Genesis 1</th><th className="p-3 md:p-4 font-playfair font-bold text-lg text-gray-100">Enuma Elish (Babylonian)</th><th className="p-3 md:p-4 font-playfair font-bold text-lg text-gray-100">Egyptian Myths</th></tr></thead><tbody className="divide-y divide-gray-700/50 font-inter text-gray-300">{comparisonTableData.map(row => (<tr key={row.feature}><td className="p-3 md:p-4 font-semibold text-gray-100">{row.feature}</td><td className="p-3 md:p-4">{row.genesis}</td><td className="p-3 md:p-4">{row.enuma}</td><td className="p-3 md:p-4">{row.egyptian}</td></tr>))}</tbody></table></div>
+        </section>
+      </div>
+    </main>
+  );
+}
+--- End of File: src/app/creation/page.tsx ---
+--------------------------------------------------
+
+--- File: src/app/page.tsx ---
+--------------------------------------------------
+import ArgumentFlow from '@/components/ArgumentFlow';
+import Hero from '@/components/Hero'; // Import the new Hero component
+
+export default function HomePage() {
+  return (
+    <main>
+      <Hero />
+      <ArgumentFlow />
+    </main>
+  );
+}
+--- End of File: src/app/page.tsx ---
+--------------------------------------------------
+
+--- File: src/app/materialism/page.tsx ---
+--------------------------------------------------
+import Link from 'next/link';
+import CambrianChart from '@/components/CambrianChart';
+
+const SectionDivider = () => <hr className="my-16 border-t border-gray-800" />;
+
+const crisisData = [
+    { title: 'Crisis 1: The Cosmological Origin', summary: 'Materialism has no explanation for the origin of the universe itself. The Borde-Guth-Vilenkin theorem proves any expanding universe must have a beginning. The question "What caused the Big Bang?" is one science cannot answer, as the cause must be outside of space and time.'},
+    { title: 'Crisis 2: The Design Origin (Fine-Tuning)', summary: 'The physical laws and constants of the universe are balanced on a razor\'s edge. To explain this, materialism posits an unobservable, infinite multiverse—a faith-based, unscientific proposition.'},
+    { title: 'Crisis 3: The Biological Origin (Life)', summary: 'The spontaneous generation of life from non-living chemicals (abiogenesis) is statistically impossible. It requires functional proteins and instructional DNA to exist simultaneously. The "primordial soup" is now considered a myth by many researchers.'},
+    { title: 'Crisis 4: The Species Origin (Humans)', summary: 'While microevolution is a fact, macroevolution—the idea that unguided natural selection can create fundamentally new body plans and the information for them—is a theory in crisis, contradicted by the fossil record, most notably the Cambrian Explosion.', chart: true }
+];
+
+export default function MaterialismPage() {
+  return (
+    <main className="py-16 sm:py-20">
+      {/* Page container is now wider */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+            <Link href="/" className="mb-8 inline-flex items-center text-sm font-semibold text-accent-gold hover:text-amber-300 transition-colors">← Back to Main Argument</Link>
+            <h1 className="font-playfair text-4xl md:text-5xl font-bold text-center text-accent-gold">The Materialist's Paradox</h1>
+            <p className="mt-4 font-inter text-xl text-gray-300 text-center max-w-3xl mx-auto">An Analytical Audit of the Prevailing Scientific Worldview</p>
+        </div>
+
+        <SectionDivider />
+
+        <div className="max-w-4xl mx-auto">
+            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-center text-gray-100">The Data That Shatters the Paradigm</h2>
+            <p className="mt-6 font-inter text-lg text-gray-300 text-center">The most direct falsification of materialism comes from a large, well-documented, and peer-reviewed body of evidence: <strong>veridical Near-Death Experiences (NDEs).</strong> These are cases where individuals, while clinically dead with no measurable brain activity, report accurate perceptions of events outside the reach of their physical senses.</p>
+        </div>
+        
+        {/* REDESIGNED: Logical Implications Section */}
+        <div className="mt-16 glass-card p-8 md:p-12">
+            <h3 className="font-playfair text-2xl md:text-3xl font-bold text-center mb-8 text-amber-400">The Logical Implication of Veridical NDEs</h3>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-center">
+                {/* Premise 1 */}
+                <div className="flex-1 max-w-sm"><div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center border-2 border-accent-gold/50 rounded-full bg-accent-gold/10 text-accent-gold font-playfair text-3xl">1</div><h4 className="font-playfair font-bold text-lg text-gray-100">Premise (Materialism)</h4><p className="font-inter text-sm text-gray-400 mt-2">Consciousness is a product of the physical brain. No brain activity = no consciousness.</p></div>
+                
+                <div className="text-5xl font-thin text-gray-600 self-center transform rotate-90 md:rotate-0">+</div>
+
+                {/* Premise 2 */}
+                <div className="flex-1 max-w-sm"><div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center border-2 border-blue-400/50 rounded-full bg-blue-400/10 text-blue-400 font-playfair text-3xl">2</div><h4 className="font-playfair font-bold text-lg text-gray-100">Premise (The Data)</h4><p className="font-inter text-sm text-gray-400 mt-2">Verified cases show consciousness and perception occur with no measurable brain activity.</p></div>
+                
+                <div className="text-5xl font-thin text-gray-600 self-center transform rotate-90 md:rotate-0">=</div>
+
+                {/* Conclusion */}
+                <div className="flex-1 max-w-sm"><div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center border-2 border-red-500/50 rounded-full bg-red-500/10 text-red-500 font-playfair text-3xl">!</div><h4 className="font-playfair font-bold text-lg text-gray-100">Conclusion (Falsified)</h4><p className="font-inter text-sm text-gray-400 mt-2">The core claim of materialism is contradicted by objective, repeatable data.</p></div>
+            </div>
+        </div>
+        
+        <SectionDivider />
+
+        <div className="max-w-4xl mx-auto">
+            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-center text-gray-100">The Four Origin Crises</h2>
+            <p className="mt-6 font-inter text-lg text-gray-300 text-center">Beyond the direct falsification from NDEs, materialism fails to provide any coherent, evidence-based explanation for the fundamental questions of origin.</p>
+        </div>
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {crisisData.map((crisis, index) => (
+                // Applying the interactive card style here
+                <div key={index} className="glass-card-interactive p-8">
+                    <h3 className="font-playfair font-bold text-2xl mb-3 text-amber-400">{crisis.title}</h3>
+                    <p className="font-inter text-gray-300">{crisis.summary}</p>
+                    {crisis.chart && <CambrianChart />}
+                </div>
+            ))}
+        </div>
+
+        <SectionDivider />
+        
+        <div className="max-w-4xl mx-auto">
+            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-center text-gray-100">The Great Reversal: A Balance of Faith</h2>
+            <p className="mt-6 font-inter text-lg text-gray-300 text-center">The evidence suggests a reversal of the common narrative. A worldview's strength is measured by what it can explain with the fewest unproven articles of faith.</p>
+        </div>
+        {/* REDESIGNED: Great Reversal Section */}
+        <div className="mt-16 glass-card">
+            <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-700/50">
+                <div className="p-8"><h3 className="font-playfair font-bold text-xl mb-4 text-center text-red-400">The Materialist's Ledger of Faith</h3><ul className="space-y-4 font-inter text-gray-300">{['I have faith that consciousness and reason arose from non-conscious, non-rational matter.', 'I have faith the universe began to exist without a cause, violating known physics.', 'I have faith in an unobservable, infinite multiverse to explain away cosmic fine-tuning.', 'I have faith that life spontaneously organized itself from non-living chemicals against astronomical odds.', 'I have faith that all NDE data from verifiable sources is universally false or misinterpreted.'].map(item => <li key={item} className="flex items-start"><span className="text-red-500 mr-3 mt-1">✗</span><span>{item}</span></li>)}</ul></div>
+                <div className="p-8"><h3 className="font-playfair font-bold text-xl mb-4 text-center text-blue-400">The Theist's Ledger of Faith</h3><ul className="space-y-4 font-inter text-gray-300">{['I have faith that a transcendent, intelligent Mind is the best explanation for a universe exhibiting the properties of a thought: a beginning, elegant laws, fine-tuning for life, and the presence of other minds.'].map(item => <li key={item} className="flex items-start"><span className="text-blue-400 mr-3 mt-1">✓</span><span>{item}</span></li>)}</ul></div>
+            </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+--- End of File: src/app/materialism/page.tsx ---
+--------------------------------------------------
+
+--- File: eslint.config.js ---
+--------------------------------------------------
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { FlatCompat } from "@eslint/eslintrc";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+const eslintConfig = [
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+];
+
+export default eslintConfig;
+
+--- End of File: eslint.config.js ---
+--------------------------------------------------
+
+--- File: next-env.d.ts ---
+--------------------------------------------------
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/basic-features/typescript for more information.
+
+--- End of File: next-env.d.ts ---
+--------------------------------------------------
+
+--- File: postcss.config.js ---
+--------------------------------------------------
+/** PostCSS config for Tailwind 3 */
+module.exports = {
+  plugins: {
+    tailwindcss: {},   // ✅ Classic plugin works with Tailwind 3
+    autoprefixer: {},
+  },
+};
+
+--- End of File: postcss.config.js ---
+--------------------------------------------------
+
+--- File: tsconfig.json ---
+--------------------------------------------------
+{
+  "compilerOptions": {
+    /* === Project-wide settings (unchanged defaults) === */
+    "target": "es2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    /* === Alias we need === */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "**/*.js",
+    "**/*.ts",
+    "**/*.tsx",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+
+--- End of File: tsconfig.json ---
+--------------------------------------------------
+
+--- File: next.config.mjs ---
+--------------------------------------------------
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Your Next.js config options go here.
+  // We can leave it empty for now.
+};
+
+export default nextConfig;
+--- End of File: next.config.mjs ---
+--------------------------------------------------
+
+--- File: README.md ---
+--------------------------------------------------
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+--- End of File: README.md ---
+--------------------------------------------------
+
+--- File: .gitignore ---
+--------------------------------------------------
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+--- End of File: .gitignore ---
+--------------------------------------------------
+
+--- File: tailwind.config.js ---
+--------------------------------------------------
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+  theme: {
+    extend: {
+      colors: {
+        // Renaming for clarity and semantic meaning
+        'cosmic-ink': '#030712',      // Primary Background
+        'luminous-cyan': '#22d3ee',   // Primary Accent (replaces orange)
+        'ancient-gold': '#d4af37',     // Secondary Accent (sparingly used)
+        'stellar-magenta': '#c026d3', // Data Visualization
+        'brand-navy': '#0a0f1f',
+        'accent-gold': '#f59e0b',
+        // Custom tokens used in JSX
+        'brand-navy': '#0a0f1f',
+        'accent-gold': '#f59e0b',
+        // Added tokens referenced in JSX
+        'brand-navy': '#0a0f1f',
+        'accent-gold': '#f59e0b',
+        
+        // UI Text & Elements
+        'text-bright': '#f9fafb',      // Headings
+        'text-neutral': '#d1d5db',     // Body Text
+        'text-subtle': '#9ca3af',       // Muted text, captions
+        'ui-slate': '#374151',         // Borders, dividers
+        'ui-hover': 'rgba(255, 255, 255, 0.05)', // Subtle hover for list items, etc.
+      },
+      fontFamily: { 
+        playfair: ['var(--font-playfair)'], 
+        inter: ['var(--font-inter)'] 
+      },
+      // A new, more subtle "glow" effect for the Luminous Cyan
+      boxShadow: {
+        'glow-cyan': '0 0 15px rgba(34, 211, 238, 0.25), 0 0 30px rgba(34, 211, 238, 0.1)',
+      },
+      // Adding a fade-in animation for content
+      keyframes: {
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+      },
+    },
+  },
+  plugins: [],
+};
+--- End of File: tailwind.config.js ---
+--------------------------------------------------
